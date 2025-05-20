@@ -2,6 +2,7 @@ import { pgTable, text, serial, integer, boolean, timestamp, json } from "drizzl
 import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod";
 
+// User table definition
 export const users = pgTable("users", {
   id: serial("id").primaryKey(),
   username: text("username").notNull().unique(),
@@ -12,6 +13,7 @@ export const users = pgTable("users", {
   createdAt: timestamp("created_at").defaultNow(),
 });
 
+// Tournament table definition
 export const tournaments = pgTable("tournaments", {
   id: serial("id").primaryKey(),
   name: text("name").notNull(),
@@ -28,6 +30,7 @@ export const tournaments = pgTable("tournaments", {
   createdAt: timestamp("created_at").defaultNow(),
 });
 
+// Team table definition
 export const teams = pgTable("teams", {
   id: serial("id").primaryKey(),
   name: text("name").notNull(),
@@ -36,32 +39,18 @@ export const teams = pgTable("teams", {
   createdAt: timestamp("created_at").defaultNow(),
 });
 
-export const teamMembers = pgTable("team_members", {
-  id: serial("id").primaryKey(),
-  teamId: integer("team_id").references(() => teams.id),
-  userId: integer("user_id").references(() => users.id),
-  role: text("role"),
-  joinedAt: timestamp("joined_at").defaultNow(),
-});
-
+// Match table definition
 export const matches = pgTable("matches", {
   id: serial("id").primaryKey(),
   tournamentId: integer("tournament_id").references(() => tournaments.id),
   startTime: timestamp("start_time"),
-  status: text("status").default("scheduled"), // scheduled, live, completed, cancelled
+  status: text("status").default("scheduled"),
   round: integer("round").default(1),
   results: json("results").$type<any>(),
   createdAt: timestamp("created_at").defaultNow(),
 });
 
-export const registrations = pgTable("registrations", {
-  id: serial("id").primaryKey(),
-  tournamentId: integer("tournament_id").references(() => tournaments.id),
-  teamId: integer("team_id").references(() => teams.id),
-  status: text("status").default("pending"), // pending, approved, rejected
-  registeredAt: timestamp("registered_at").defaultNow(),
-});
-
+// Notification table definition
 export const notifications = pgTable("notifications", {
   id: serial("id").primaryKey(),
   userId: integer("user_id").references(() => users.id),

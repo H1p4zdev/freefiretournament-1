@@ -2,11 +2,9 @@ import { Team } from "@shared/schema";
 
 interface TeamCardProps {
   team: Team;
-  tournamentsPlayed?: number;
-  badges?: string[];
 }
 
-export default function TeamCard({ team, tournamentsPlayed = 0, badges = [] }: TeamCardProps) {
+export default function TeamCard({ team }: TeamCardProps) {
   return (
     <div className="flex items-center justify-between py-3 border-b border-dark-lighter">
       <div className="flex items-center">
@@ -15,11 +13,11 @@ export default function TeamCard({ team, tournamentsPlayed = 0, badges = [] }: T
         </div>
         <div>
           <h4 className="font-medium text-white">{team.name}</h4>
-          <p className="text-xs text-text-secondary">{tournamentsPlayed} tournaments played</p>
+          <p className="text-xs text-text-secondary">{team.tournamentsPlayed} tournaments played</p>
         </div>
       </div>
       <div className="flex items-center">
-        {badges.map((badge, index) => (
+        {team.badges.map((badge, index) => (
           <div 
             key={index}
             className={`${

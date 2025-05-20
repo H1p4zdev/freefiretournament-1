@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { useLocation } from "wouter";
 import { useForm } from "react-hook-form";
@@ -111,21 +112,13 @@ export default function Auth() {
             <div className="flex space-x-2 mb-6">
               <button 
                 onClick={() => setMode("login")}
-                className={`flex-1 py-2 px-4 text-center rounded-md font-rajdhani ${
-                  mode === "login" 
-                    ? "bg-primary text-white" 
-                    : "bg-dark-lighter text-text-secondary"
-                }`}
+                className={`w-1/2 py-2 text-center font-rajdhani font-bold border-b-2 ${mode === "login" ? "text-white border-primary" : "text-text-secondary border-dark-lighter"}`}
               >
                 LOGIN
               </button>
               <button 
                 onClick={() => setMode("register")}
-                className={`flex-1 py-2 px-4 text-center rounded-md font-rajdhani ${
-                  mode === "register" 
-                    ? "bg-primary text-white" 
-                    : "bg-dark-lighter text-text-secondary"
-                }`}
+                className={`w-1/2 py-2 text-center font-rajdhani font-bold border-b-2 ${mode === "register" ? "text-white border-primary" : "text-text-secondary border-dark-lighter"}`}
               >
                 REGISTER
               </button>
@@ -139,34 +132,40 @@ export default function Auth() {
                     name="email"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel className="text-text-primary">Email</FormLabel>
+                        <FormLabel className="text-text-secondary">Email</FormLabel>
                         <FormControl>
-                          <Input 
-                            placeholder="Enter your email" 
-                            className="bg-dark-lighter border-dark-lighter text-text-primary" 
-                            {...field} 
+                          <Input
+                            type="email"
+                            placeholder="your@email.com"
+                            className="bg-dark-lighter border-dark-lighter focus:border-primary text-white"
+                            onChange={(e) => field.onChange(e.target.value)}
+                            value={field.value}
                           />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
                     )}
                   />
-                  
+
                   <FormField
                     control={loginForm.control}
                     name="password"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel className="text-text-primary">Password</FormLabel>
+                        <FormLabel className="text-text-secondary">Password</FormLabel>
                         <FormControl>
-                          <Input 
-                            type="password" 
-                            placeholder="Enter your password" 
-                            className="bg-dark-lighter border-dark-lighter text-text-primary" 
-                            {...field} 
+                          <Input
+                            type="password"
+                            placeholder="••••••••"
+                            className="bg-dark-lighter border-dark-lighter focus:border-primary text-white"
+                            onChange={(e) => field.onChange(e.target.value)}
+                            value={field.value}
                           />
                         </FormControl>
                         <FormMessage />
+                        <div className="flex justify-end mt-2">
+                          <a href="#" className="text-secondary text-sm hover:underline">Forgot Password?</a>
+                        </div>
                       </FormItem>
                     )}
                   />
@@ -186,68 +185,74 @@ export default function Auth() {
                     name="username"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel className="text-text-primary">Username</FormLabel>
+                        <FormLabel className="text-text-secondary">Username</FormLabel>
                         <FormControl>
-                          <Input 
-                            placeholder="Choose a username" 
-                            className="bg-dark-lighter border-dark-lighter text-text-primary" 
-                            {...field} 
+                          <Input
+                            type="text"
+                            placeholder="gamertag"
+                            className="bg-dark-lighter border-dark-lighter focus:border-primary text-white hover:border-primary"
+                            onChange={(e) => field.onChange(e.target.value)}
+                            value={field.value}
                           />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
                     )}
                   />
-                  
+
                   <FormField
                     control={registerForm.control}
                     name="email"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel className="text-text-primary">Email</FormLabel>
+                        <FormLabel className="text-text-secondary">Email</FormLabel>
                         <FormControl>
-                          <Input 
-                            placeholder="Enter your email" 
-                            className="bg-dark-lighter border-dark-lighter text-text-primary" 
-                            {...field} 
+                          <Input
+                            type="email"
+                            placeholder="your@email.com"
+                            className="bg-dark-lighter border-dark-lighter focus:border-primary text-white hover:border-primary"
+                            onChange={(e) => field.onChange(e.target.value)}
+                            value={field.value}
                           />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
                     )}
                   />
-                  
+
                   <FormField
                     control={registerForm.control}
                     name="password"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel className="text-text-primary">Password</FormLabel>
+                        <FormLabel className="text-text-secondary">Password</FormLabel>
                         <FormControl>
-                          <Input 
-                            type="password" 
-                            placeholder="Create a password" 
-                            className="bg-dark-lighter border-dark-lighter text-text-primary" 
-                            {...field} 
+                          <Input
+                            type="password"
+                            placeholder="••••••••"
+                            className="bg-dark-lighter border-dark-lighter focus:border-primary text-white"
+                            onChange={(e) => field.onChange(e.target.value)}
+                            value={field.value}
                           />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
                     )}
                   />
-                  
+
                   <FormField
                     control={registerForm.control}
                     name="confirmPassword"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel className="text-text-primary">Confirm Password</FormLabel>
+                        <FormLabel className="text-text-secondary">Confirm Password</FormLabel>
                         <FormControl>
-                          <Input 
-                            type="password" 
-                            placeholder="Confirm your password" 
-                            className="bg-dark-lighter border-dark-lighter text-text-primary" 
-                            {...field} 
+                          <Input
+                            type="password"
+                            placeholder="••••••••"
+                            className="bg-dark-lighter border-dark-lighter focus:border-primary text-white"
+                            onChange={(e) => field.onChange(e.target.value)}
+                            value={field.value}
                           />
                         </FormControl>
                         <FormMessage />

@@ -1,84 +1,13 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
+import { useQuery } from "@tanstack/react-query";
 import NavBar from "@/components/nav-bar";
 import TournamentCard from "@/components/tournament-card";
 import MatchCard from "@/components/match-card";
 import { useAuth } from "@/contexts/auth-context";
 import { useLocation } from "wouter";
-import { Tournament } from "@shared/schema";
-
-// Mock data for the dashboard
-const mockTournaments: (Tournament & { registrationOpen: boolean, maxParticipants: number, participantsCount: number, prizePool: number })[] = [
-  {
-    id: 1,
-    name: "Free Fire Pro League",
-    description: "Weekly professional tournament with top teams",
-    startDate: new Date(Date.now() + 86400000 * 3), // 3 days from now
-    endDate: new Date(Date.now() + 86400000 * 4),
-    registrationOpen: true,
-    maxParticipants: 100,
-    participantsCount: 78,
-    prizePool: 50000,
-    rules: "Standard competitive rules apply",
-    format: "Battle Royale - Squad",
-    organizerId: 1,
-    createdAt: new Date()
-  },
-  {
-    id: 2,
-    name: "Weekend Warriors Cup",
-    description: "Weekend tournament for casual players",
-    startDate: new Date(Date.now() + 86400000 * 5), // 5 days from now
-    endDate: new Date(Date.now() + 86400000 * 6),
-    registrationOpen: true,
-    maxParticipants: 50,
-    participantsCount: 22,
-    prizePool: 10000,
-    rules: "Standard rules with special weekend bonuses",
-    format: "Battle Royale - Duo",
-    organizerId: 2,
-    createdAt: new Date()
-  },
-  {
-    id: 3,
-    name: "Elite Championship",
-    description: "Invitation-only tournament for top players",
-    startDate: new Date(Date.now() + 86400000 * 10), // 10 days from now
-    endDate: new Date(Date.now() + 86400000 * 11),
-    registrationOpen: false,
-    maxParticipants: 32,
-    participantsCount: 32,
-    prizePool: 100000,
-    rules: "Professional rules apply, strict enforcement",
-    format: "Battle Royale - Squad",
-    organizerId: 1,
-    createdAt: new Date()
-  }
-];
-
-// Mock recent matches data
-const mockMatches = [
-  {
-    id: 1,
-    tournamentName: "Free Fire Pro League",
-    position: 1,
-    pointsEarned: 25,
-    date: new Date(Date.now() - 86400000 * 2) // 2 days ago
-  },
-  {
-    id: 2,
-    tournamentName: "Weekend Warriors Cup",
-    position: 3,
-    pointsEarned: 15,
-    date: new Date(Date.now() - 86400000 * 5) // 5 days ago
-  },
-  {
-    id: 3,
-    tournamentName: "Daily Tournament",
-    position: 5,
-    pointsEarned: 7,
-    date: new Date(Date.now() - 86400000 * 7) // 7 days ago
-  }
-];
+import { Tournament, Match } from "@shared/schema";
+import { ref, get } from "firebase/database";
+import { db } from "@/lib/firebase";
 
 export default function Dashboard() {
   const { currentUser } = useAuth();
@@ -90,10 +19,36 @@ export default function Dashboard() {
     }
   }, [currentUser, setLocation]);
 
+  // Fetch tournaments data
+  const { data: tournaments, isLoading: tournamentsLoading } = useQuery({
+    queryKey: ['/api/tournaments'],
+    queryFn: async () => {
+      const snapshot = await get(ref(db, 'tournaments'));
+      if (snapshot.exists()) {
+        return Object.values(snapshot.val()) as Tournament[];
+      }
+      return [];
+    }
+  });
+
+  // Fetch recent matches data
+  const { data: recentMatches, isLoading: matchesLoading } = useQuery({
+    queryKey: ['/api/matches/recent', currentUser?.uid],
+    queryFn: async () => {
+      if (!currentUser) return [];
+      const snapshot = await get(ref(db, `users/${currentUser.uid}/matches`));
+      if (snapshot.exists()) {
+        return Object.values(snapshot.val()) as Match[];
+      }
+      return [];
+    },
+    enabled: !!currentUser
+  });
+
   // Stats for the dashboard
   const stats = {
-    tournaments: mockTournaments.length,
-    matches: mockMatches.length
+    tournaments: tournaments?.length || 0,
+    matches: recentMatches?.length || 0
   };
 
   if (!currentUser) return null;
@@ -153,13 +108,17 @@ export default function Dashboard() {
             <a href="#" className="text-primary text-sm">View All</a>
           </div>
           
-          {mockTournaments && mockTournaments.length > 0 ? (
+          {tournamentsLoading ? (
+            <div className="p-8 flex justify-center">
+              <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-primary"></div>
+            </div>
+          ) : tournaments && tournaments.length > 0 ? (
             <>
               {/* Featured tournament */}
-              <TournamentCard tournament={mockTournaments[0]} mode="full" />
+              <TournamentCard tournament={tournaments[0]} mode="full" />
               
               {/* Other tournaments */}
-              {mockTournaments.slice(1, 3).map((tournament) => (
+              {tournaments.slice(1, 3).map((tournament) => (
                 <TournamentCard key={tournament.id} tournament={tournament} />
               ))}
             </>
@@ -177,16 +136,13 @@ export default function Dashboard() {
             <a href="#" className="text-primary text-sm">History</a>
           </div>
           
-          {mockMatches && mockMatches.length > 0 ? (
-            mockMatches.map((match) => (
-              <MatchCard 
-                key={match.id} 
-                match={{} as any} // Placeholder to match interface
-                tournamentName={match.tournamentName}
-                position={match.position}
-                pointsEarned={match.pointsEarned}
-                date={match.date}
-              />
+          {matchesLoading ? (
+            <div className="p-8 flex justify-center">
+              <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-primary"></div>
+            </div>
+          ) : recentMatches && recentMatches.length > 0 ? (
+            recentMatches.map((match) => (
+              <MatchCard key={match.id} match={match} />
             ))
           ) : (
             <div className="bg-dark-surface rounded-xl p-6 text-center">

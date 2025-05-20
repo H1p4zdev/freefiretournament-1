@@ -2,22 +2,12 @@ import { Match } from "@shared/schema";
 
 interface MatchCardProps {
   match: Match;
-  position?: number;
-  tournamentName?: string;
-  pointsEarned?: number;
-  date?: Date;
 }
 
-export default function MatchCard({ 
-  match, 
-  position = 4, 
-  tournamentName = "Free Fire Tournament",
-  pointsEarned = 0,
-  date = new Date()
-}: MatchCardProps) {
+export default function MatchCard({ match }: MatchCardProps) {
   // Determine the badge color and icon based on the position
   const getBadgeContent = () => {
-    switch (position) {
+    switch (match.position) {
       case 1:
         return {
           bgColor: "bg-success",
@@ -47,7 +37,7 @@ export default function MatchCard({
 
   // Determine points color based on position
   const getPointsColor = () => {
-    switch (position) {
+    switch (match.position) {
       case 1:
         return "text-success";
       case 2:
@@ -62,7 +52,7 @@ export default function MatchCard({
   const pointsColor = getPointsColor();
   
   // Format the date
-  const matchDate = date;
+  const matchDate = new Date(match.date);
   const formattedDate = new Intl.DateTimeFormat("en-US", {
     month: "long",
     day: "numeric"
@@ -77,11 +67,11 @@ export default function MatchCard({
           </div>
           <div>
             <h3 className="font-bold text-white">{badge.text}</h3>
-            <p className="text-xs text-text-secondary">{tournamentName} • {formattedDate}</p>
+            <p className="text-xs text-text-secondary">{match.tournamentName} • {formattedDate}</p>
           </div>
         </div>
         <div className="text-right">
-          <p className={`font-bold ${pointsColor} text-xl font-rajdhani`}>+{pointsEarned}</p>
+          <p className={`font-bold ${pointsColor} text-xl font-rajdhani`}>+{match.pointsEarned}</p>
           <p className="text-xs text-text-secondary">POINTS</p>
         </div>
       </div>
