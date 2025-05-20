@@ -5,8 +5,8 @@ import { getFirestore } from "firebase/firestore";
 import { getStorage } from "firebase/storage";
 import { getAnalytics } from "firebase/analytics";
 
-// Import the configuration from the attached assets
-import firebaseConfig from "@assets/firebase-config.js";
+// Import the configuration from the client assets
+import firebaseConfig from "@/assets/firebase-config.js";
 
 // Initialize Firebase
 const app = initializeApp(firebaseConfig);
