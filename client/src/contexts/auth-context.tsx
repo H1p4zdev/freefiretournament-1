@@ -1,12 +1,17 @@
 import React, { createContext, useContext, useState, useEffect } from "react";
+import { 
+  createUserWithEmailAndPassword, 
+  signInWithEmailAndPassword, 
+  signOut,
+  onAuthStateChanged,
+  GoogleAuthProvider, 
+  signInWithPopup,
+  FacebookAuthProvider,
+  User,
+  TwitterAuthProvider
+} from "firebase/auth";
+import { auth } from "@/lib/firebase";
 import { useToast } from "@/hooks/use-toast";
-
-// Mock User type for development
-interface User {
-  uid: string;
-  email: string | null;
-  displayName: string | null;
-}
 
 interface AuthContextType {
   currentUser: User | null;
@@ -31,35 +36,21 @@ export const useAuth = () => {
 
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [currentUser, setCurrentUser] = useState<User | null>(null);
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
   const { toast } = useToast();
 
-  // For demo purposes, we'll use a simulated authentication
   useEffect(() => {
-    // Simulate checking if user is already logged in
-    const savedUser = localStorage.getItem('freefire_user');
-    if (savedUser) {
-      setCurrentUser(JSON.parse(savedUser));
-    }
-    setLoading(false);
+    const unsubscribe = onAuthStateChanged(auth, (user) => {
+      setCurrentUser(user);
+      setLoading(false);
+    });
+
+    return unsubscribe;
   }, []);
 
   const signIn = async (email: string, password: string) => {
     try {
-      // Simulate authentication
-      // In a real app, this would call Firebase or your auth service
-      if (email && password) {
-        // For demo, we'll accept any email/password combo
-        const user: User = {
-          uid: Math.random().toString(36).substring(2),
-          email: email,
-          displayName: email.split('@')[0]
-        };
-        setCurrentUser(user);
-        localStorage.setItem('freefire_user', JSON.stringify(user));
-      } else {
-        throw new Error("Email and password required");
-      }
+      await signInWithEmailAndPassword(auth, email, password);
     } catch (error: any) {
       toast({
         title: "Error signing in",
@@ -72,18 +63,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const signUp = async (email: string, password: string) => {
     try {
-      // Simulate registration
-      if (email && password) {
-        const user: User = {
-          uid: Math.random().toString(36).substring(2),
-          email: email,
-          displayName: email.split('@')[0]
-        };
-        setCurrentUser(user);
-        localStorage.setItem('freefire_user', JSON.stringify(user));
-      } else {
-        throw new Error("Email and password required");
-      }
+      await createUserWithEmailAndPassword(auth, email, password);
     } catch (error: any) {
       toast({
         title: "Error signing up",
@@ -96,8 +76,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const logOut = async () => {
     try {
-      setCurrentUser(null);
-      localStorage.removeItem('freefire_user');
+      await signOut(auth);
     } catch (error: any) {
       toast({
         title: "Error signing out",
@@ -110,14 +89,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const signInWithGoogle = async () => {
     try {
-      // Simulate Google sign in
-      const user: User = {
-        uid: Math.random().toString(36).substring(2),
-        email: 'user@gmail.com',
-        displayName: 'Google User'
-      };
-      setCurrentUser(user);
-      localStorage.setItem('freefire_user', JSON.stringify(user));
+      const provider = new GoogleAuthProvider();
+      await signInWithPopup(auth, provider);
     } catch (error: any) {
       toast({
         title: "Error signing in with Google",
@@ -130,14 +103,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const signInWithFacebook = async () => {
     try {
-      // Simulate Facebook sign in
-      const user: User = {
-        uid: Math.random().toString(36).substring(2),
-        email: 'user@facebook.com',
-        displayName: 'Facebook User'
-      };
-      setCurrentUser(user);
-      localStorage.setItem('freefire_user', JSON.stringify(user));
+      const provider = new FacebookAuthProvider();
+      await signInWithPopup(auth, provider);
     } catch (error: any) {
       toast({
         title: "Error signing in with Facebook",
@@ -150,14 +117,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const signInWithTwitter = async () => {
     try {
-      // Simulate Twitter sign in
-      const user: User = {
-        uid: Math.random().toString(36).substring(2),
-        email: 'user@twitter.com',
-        displayName: 'Twitter User'
-      };
-      setCurrentUser(user);
-      localStorage.setItem('freefire_user', JSON.stringify(user));
+      const provider = new TwitterAuthProvider();
+      await signInWithPopup(auth, provider);
     } catch (error: any) {
       toast({
         title: "Error signing in with Twitter",
